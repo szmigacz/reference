@@ -5,6 +5,7 @@ import torch.nn as nn
 
 from seq2seq.models.attention import BahdanauAttention
 import seq2seq.data.config as config
+import seq2seq.utils as utils
 
 
 class RecurrentAttention(nn.Module):
@@ -16,6 +17,7 @@ class RecurrentAttention(nn.Module):
 
         self.rnn = nn.LSTM(input_size, hidden_size, num_layers, bias,
                            batch_first)
+        utils.forget_bias(self.rnn)
 
         self.attn = BahdanauAttention(hidden_size, context_size, context_size,
                                       normalize=True, batch_first=batch_first)
@@ -72,6 +74,8 @@ class ResidualRecurrentDecoder(nn.Module):
             self.rnn_layers.append(
                 nn.LSTM(2 * hidden_size, hidden_size, num_layers=1, bias=bias,
                         batch_first=batch_first))
+        for lstm in self.rnn_layers:
+            utils.forget_bias(lstm)
 
         if embedder is not None:
             self.embedder = embedder

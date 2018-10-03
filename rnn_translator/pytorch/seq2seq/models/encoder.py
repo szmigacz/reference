@@ -3,6 +3,7 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from torch.nn.utils.rnn import pad_packed_sequence
 
 import seq2seq.data.config as config
+import seq2seq.utils as utils
 
 
 class ResidualRecurrentEncoder(nn.Module):
@@ -25,6 +26,9 @@ class ResidualRecurrentEncoder(nn.Module):
             self.rnn_layers.append(
                 nn.LSTM(hidden_size, hidden_size, num_layers=1, bias=bias,
                         batch_first=batch_first))
+
+        for lstm in self.rnn_layers:
+            utils.forget_bias(lstm)
 
         self.dropout = nn.Dropout(p=dropout)
 

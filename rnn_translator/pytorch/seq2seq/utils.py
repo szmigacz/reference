@@ -8,6 +8,14 @@ from torch.nn.utils.rnn import pack_padded_sequence
 
 import seq2seq.data.config as config
 
+def forget_bias(lstm_layer, bias=1.0):
+    hidden_size = lstm_layer.hidden_size
+    bias = bias / 2
+    lstm_layer.bias_hh_l0.data[hidden_size:2*hidden_size] += bias
+    lstm_layer.bias_ih_l0.data[hidden_size:2*hidden_size] += bias
+    if lstm_layer.bidirectional:
+        lstm_layer.bias_hh_l0_reverse.data[hidden_size:2*hidden_size] += bias
+        lstm_layer.bias_ih_l0_reverse.data[hidden_size:2*hidden_size] += bias
 
 def barrier():
     """ Calls all_reduce on dummy tensor."""
